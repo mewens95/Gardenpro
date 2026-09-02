@@ -1,0 +1,10 @@
+{
+  "name": "GardenPro",
+  "short_name": "GardenPro",
+  "description": "Garden business manager for self-employed gardeners.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f1",
+  "theme_color": "#193b23",
+  "icons": []
+}

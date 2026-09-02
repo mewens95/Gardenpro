@@ -3,190 +3,179 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#1f6b45">
+<meta name="theme-color" content="#176b3a">
 <link rel="manifest" href="manifest.webmanifest">
 <title>GardenPro</title>
 <style>
-body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#f4f7f4;color:#17221b}
-header{background:#1f6b45;color:#fff;padding:18px}
-nav{display:flex;overflow:auto;background:#fff;border-bottom:1px solid #ddd}
-nav button{padding:13px;border:0;background:#fff;font-weight:700;white-space:nowrap}
-main{padding:16px;max-width:900px;margin:auto}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:15px;margin-bottom:14px}
-.stat{font-size:28px;font-weight:800}.muted{color:#68736c;font-size:13px}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.btn{background:#1f6b45;color:#fff;border:0;border-radius:9px;padding:10px 13px;font-weight:700}
-.btn2{background:#e8eee9;color:#1f6b45}.item{padding:12px 0;border-bottom:1px solid #ddd}
-input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
-label{display:block;font-size:13px;font-weight:700;margin:9px 0 4px}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.auth{max-width:430px;margin:35px auto}.danger{color:#9a2d2d}
-@media(max-width:600px){.formgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#17351f}
+header{background:#176b3a;color:white;padding:20px}
+h1{margin:0 0 5px;font-size:28px}.sub{opacity:.9}
+main{max-width:900px;margin:auto;padding:18px}
+.card{background:white;border-radius:14px;padding:18px;margin:14px 0;box-shadow:0 2px 10px #0001}
+input,button,select,textarea{width:100%;box-sizing:border-box;padding:13px;margin:7px 0;border-radius:9px;border:1px solid #ccd8cf;font-size:16px}
+button{background:#176b3a;color:white;border:0;font-weight:bold}
+button.secondary{background:#e7efe9;color:#17351f}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+nav button{font-size:13px;padding:11px 5px}
+.hidden{display:none!important}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{background:#edf6ef;border-radius:12px;padding:14px}.stat b{font-size:25px;display:block}
+.item{border-top:1px solid #e3e9e5;padding:12px 0}
+.small{font-size:13px;color:#607166}
+.error{background:#ffe8e8;color:#8a2020;padding:12px;border-radius:9px}
+.success{background:#e8f7eb;color:#1d6b31;padding:12px;border-radius:9px}
+@media(max-width:650px){.grid{grid-template-columns:1fr 1fr}nav{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
-<header>
-  <div class="row">
-    <div><b style="font-size:24px">🌱 GardenPro</b><div>Professional gardener business manager</div></div>
-    <button id="logout" class="btn" style="display:none;background:#fff;color:#1f6b45" onclick="signOut()">Log out</button>
-  </div>
-</header>
+<header><h1>🌱 GardenPro</h1><div class="sub">Professional gardener business manager</div></header>
+<main>
+<section id="auth" class="card">
+<h2>Welcome to GardenPro</h2>
+<p>Sign in or create your gardener business account.</p>
+<input id="email" type="email" placeholder="Email address">
+<input id="password" type="password" placeholder="Password">
+<button id="signup">Create account</button>
+<button id="login" class="secondary">Sign in</button>
+<div id="authmsg"></div>
+</section>
 
-<div id="loginNav"></div>
-<nav id="nav" style="display:none">
-  <button onclick="page('dash')">Dashboard</button>
-  <button onclick="page('customers')">Customers</button>
-  <button onclick="page('jobs')">Jobs</button>
-  <button onclick="page('quotes')">Quotes</button>
-  <button onclick="page('invoices')">Invoices</button>
+<section id="app" class="hidden">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div><b id="userEmail"></b><div class="small">Your private GardenPro account</div></div>
+<button id="logout" style="width:auto;padding:10px 14px">Sign out</button>
+</div>
+</div>
+
+<nav>
+<button data-tab="dashboard">Dashboard</button>
+<button data-tab="customers">Customers</button>
+<button data-tab="jobs">Jobs</button>
+<button data-tab="money">Quotes & Invoices</button>
 </nav>
-<main id="app"></main>
+
+<section id="dashboard" class="tab">
+<div class="grid">
+<div class="stat"><span>Customers</span><b id="countCustomers">0</b></div>
+<div class="stat"><span>Jobs</span><b id="countJobs">0</b></div>
+<div class="stat"><span>Outstanding</span><b id="outstanding">£0</b></div>
+</div>
+<div class="card"><h2>GardenPro is connected</h2><p>Your account is connected to your secure cloud database.</p></div>
+</section>
+
+<section id="customers" class="tab hidden">
+<div class="card"><h2>Add customer</h2>
+<input id="cname" placeholder="Customer name">
+<input id="caddress" placeholder="Address">
+<input id="cphone" placeholder="Phone">
+<input id="cemail" placeholder="Email">
+<button id="addCustomer">Save customer</button><div id="cmsg"></div>
+</div>
+<div class="card"><h2>Customers</h2><div id="customerList"></div></div>
+</section>
+
+<section id="jobs" class="tab hidden">
+<div class="card"><h2>Add job</h2>
+<select id="jobCustomer"><option value="">Choose customer</option></select>
+<input id="jtitle" placeholder="Job / visit">
+<input id="jdate" type="date">
+<select id="jrepeat"><option>One-off</option><option>Weekly</option><option>Fortnightly</option><option>4-weekly</option><option>6-weekly</option></select>
+<input id="jprice" type="number" step="0.01" placeholder="Price £">
+<button id="addJob">Save job</button><div id="jmsg"></div>
+</div>
+<div class="card"><h2>Jobs</h2><div id="jobList"></div></div>
+</section>
+
+<section id="money" class="tab hidden">
+<div class="card"><h2>Add invoice</h2>
+<select id="invoiceCustomer"><option value="">Choose customer</option></select>
+<input id="invoiceNumber" placeholder="Invoice number">
+<input id="invoiceAmount" type="number" step="0.01" placeholder="Amount £">
+<select id="invoicePaid"><option value="false">Unpaid</option><option value="true">Paid</option></select>
+<button id="addInvoice">Save invoice</button><div id="imsg"></div>
+</div>
+<div class="card"><h2>Invoices</h2><div id="invoiceList"></div></div>
+</section>
+</section>
+</main>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const SUPABASE_URL = "https://acvbzacoopgpszdcdkbq.supabase.co";
+const SUPABASE_KEY = "sb_publishable_5gbQgDnijY4r6lPmTzYBsA_PD9Dgp4z";
 
-const SUPABASE_URL = 'https://acvbzacoopgpszdcdkbq.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_5gbQgDnijY4r6lPmTzYBsA_PD9Dgp4z';
-const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const authBox=document.getElementById("auth"), app=document.getElementById("app");
+const authmsg=document.getElementById("authmsg");
+let supabase, user=null, customers=[], jobs=[], invoices=[];
 
-let user = null;
-let d = {customers:[],jobs:[],quotes:[],invoices:[]};
-const app = document.getElementById('app');
-const nav = document.getElementById('nav');
-const logoutBtn = document.getElementById('logout');
-const £ = n => '£' + Number(n || 0).toFixed(2);
+function msg(el,text,ok=false){el.innerHTML='<div class="'+(ok?'success':'error')+'">'+text+'</div>'}
 
-function authScreen(message=''){
-  nav.style.display='none'; logoutBtn.style.display='none';
-  app.innerHTML=`<div class="card auth">
-    <h2>GardenPro login</h2>
-    <div class="muted">Your customers, jobs, quotes and invoices are stored securely in your GardenPro account.</div>
-    ${message?`<p class="danger">${message}</p>`:''}
-    <label>Email</label><input id="email" type="email" autocomplete="email">
-    <label>Password</label><input id="password" type="password" autocomplete="current-password">
-    <br><br>
-    <button class="btn" onclick="login()">Log in</button>
-    <button class="btn btn2" onclick="signup()">Create account</button>
-    <p class="muted">Use your own email and password. GardenPro will keep your business data separate from other users.</p>
-  </div>`;
-}
-window.login = async () => {
-  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
-  if(!email||!password) return authScreen('Enter your email and password.');
-  const {error}=await supabase.auth.signInWithPassword({email,password});
-  if(error) return authScreen(error.message);
-};
-window.signup = async () => {
-  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
-  if(!email||!password) return authScreen('Enter your email and password.');
-  if(password.length<6) return authScreen('Password must be at least 6 characters.');
-  const {data,error}=await supabase.auth.signUp({email,password});
-  if(error) return authScreen(error.message);
-  if(!data.session) return authScreen('Account created. Check your email to confirm it, then log in.');
-};
-window.signOut = async()=>{await supabase.auth.signOut();};
-
-async function loadData(){
-  const [c,j,q,i] = await Promise.all([
-    supabase.from('customers').select('*').order('name'),
-    supabase.from('jobs').select('*,customers(name)').order('date'),
-    supabase.from('quotes').select('*,customers(name)').order('created_at',{ascending:false}),
-    supabase.from('invoices').select('*,customers(name)').order('created_at',{ascending:false})
-  ]);
-  for(const r of [c,j,q,i]) if(r.error) throw r.error;
-  d.customers=c.data||[];
-  d.jobs=j.data||[];
-  d.quotes=q.data||[];
-  d.invoices=i.data||[];
-}
 async function start(){
-  const {data:{session}}=await supabase.auth.getSession();
-  user=session?.user||null;
-  if(!user){authScreen();return;}
-  nav.style.display='flex'; logoutBtn.style.display='block';
-  try{await loadData();page('dash');}
-  catch(e){app.innerHTML=`<div class="card"><h2>Database setup needed</h2><p>The GardenPro database tables have not been set up yet.</p><p>Run the supplied <b>supabase-schema.sql</b> once in Supabase SQL Editor, then refresh this page.</p><p class="danger">${e.message}</p></div>`;}
+  try{
+    const mod=await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+    supabase=mod.createClient(SUPABASE_URL,SUPABASE_KEY);
+    const {data}=await supabase.auth.getSession();
+    if(data.session) showApp(data.session.user);
+    supabase.auth.onAuthStateChange((_event,session)=>{
+      if(session) showApp(session.user); else showAuth();
+    });
+  }catch(e){
+    msg(authmsg,"GardenPro could not connect. Please refresh the page.");
+    console.error(e);
+  }
 }
-supabase.auth.onAuthStateChange(()=>start());
+function showAuth(){user=null;authBox.classList.remove("hidden");app.classList.add("hidden")}
+async function showApp(u){
+  user=u; authBox.classList.add("hidden"); app.classList.remove("hidden");
+  document.getElementById("userEmail").textContent=u.email||"GardenPro user";
+  await loadAll();
+}
+document.getElementById("signup").onclick=async()=>{
+  const email=document.getElementById("email").value.trim(), password=document.getElementById("password").value;
+  if(!email||!password)return msg(authmsg,"Enter an email and password.");
+  const {error}=await supabase.auth.signUp({email,password});
+  if(error)msg(authmsg,error.message);else msg(authmsg,"Account created. Check your email if confirmation is required.",true);
+};
+document.getElementById("login").onclick=async()=>{
+  const email=document.getElementById("email").value.trim(), password=document.getElementById("password").value;
+  const {error}=await supabase.auth.signInWithPassword({email,password});
+  if(error)msg(authmsg,error.message);
+};
+document.getElementById("logout").onclick=()=>supabase.auth.signOut();
 
-window.page = p => {
-  if(p==='dash') dash();
-  if(p==='customers') customers();
-  if(p==='jobs') jobs();
-  if(p==='quotes') quotes();
-  if(p==='invoices') invoices();
-};
-function dash(){
-  const today=new Date().toISOString().slice(0,10);
-  const outstanding=d.invoices.filter(x=>x.status!=='Paid').reduce((a,x)=>a+Number(x.amount||0),0);
-  app.innerHTML=`<h2>Dashboard</h2>
-  <div class="grid">
-    <div class="card"><div class="stat">${d.customers.length}</div><div class="muted">Customers</div></div>
-    <div class="card"><div class="stat">${d.jobs.filter(x=>x.date===today&&!x.done).length}</div><div class="muted">Jobs today</div></div>
-    <div class="card"><div class="stat">${£(outstanding)}</div><div class="muted">Money outstanding</div></div>
-    <div class="card"><div class="stat">${d.quotes.length}</div><div class="muted">Quotes</div></div>
-  </div>
-  <div class="card"><div class="row"><h3>Upcoming jobs</h3><button class="btn" onclick="jobForm()">+ Job</button></div>
-  ${d.jobs.filter(x=>!x.done).slice(0,6).map(x=>`<div class="item"><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${x.date} · ${x.repeat}</div></div>`).join('')||'<div class="muted">No upcoming jobs.</div>'}</div>`;
+async function loadAll(){
+  const c=await supabase.from("customers").select("*").order("created_at",{ascending:false});
+  const j=await supabase.from("jobs").select("*").order("date",{ascending:true});
+  const i=await supabase.from("invoices").select("*").order("created_at",{ascending:false});
+  if(c.error||j.error||i.error){console.error(c.error,j.error,i.error);return}
+  customers=c.data||[];jobs=j.data||[];invoices=i.data||[];
+  render();
 }
-function customers(){
-  app.innerHTML=`<div class="row"><h2>Customers</h2><button class="btn" onclick="customerForm()">+ Customer</button></div>
-  <div class="card">${d.customers.map(x=>`<div class="item"><b>${x.name}</b><div class="muted">${x.address||''} · ${x.phone||''}</div></div>`).join('')||'<div class="muted">No customers yet.</div>'}</div>`;
+function money(n){return "£"+Number(n||0).toFixed(2)}
+function render(){
+  countCustomers.textContent=customers.length;countJobs.textContent=jobs.length;
+  const due=invoices.filter(x=>!x.paid).reduce((a,x)=>a+Number(x.amount||0),0);outstanding.textContent=money(due);
+  customerList.innerHTML=customers.map(x=>`<div class="item"><b>${esc(x.name)}</b><br><span class="small">${esc(x.address||"")} ${esc(x.phone||"")}</span></div>`).join("")||"<p>No customers yet.</p>";
+  const opts='<option value="">Choose customer</option>'+customers.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join("");
+  jobCustomer.innerHTML=opts;invoiceCustomer.innerHTML=opts;
+  jobList.innerHTML=jobs.map(x=>`<div class="item"><b>${esc(x.title)}</b> — ${esc(x.date)} — ${money(x.price)}<br><span class="small">${esc(x.repeat||"One-off")}</span></div>`).join("")||"<p>No jobs yet.</p>";
+  invoiceList.innerHTML=invoices.map(x=>`<div class="item"><b>${esc(x.invoice_number||"Invoice")}</b> — ${money(x.amount)} — ${x.paid?"Paid":"Outstanding"}</div>`).join("")||"<p>No invoices yet.</p>";
 }
-window.customerForm=()=>{app.innerHTML=`<h2>New customer</h2><div class="card">
-<label>Name</label><input id="cn">
-<label>Address</label><input id="ca">
-<div class="formgrid"><div><label>Phone</label><input id="cp"></div><div><label>Email</label><input id="ce" type="email"></div></div>
-<label>Notes</label><textarea id="ct"></textarea><br><br><button class="btn" onclick="addCustomer()">Save customer</button></div>`};
-window.addCustomer=async()=>{
-  if(!cn.value.trim())return alert('Enter a name');
-  const {error}=await supabase.from('customers').insert({user_id:user.id,name:cn.value.trim(),address:ca.value,phone:cp.value,email:ce.value,notes:ct.value});
-  if(error)return alert(error.message); await loadData();customers();
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById(b.dataset.tab).classList.remove("hidden")});
+addCustomer.onclick=async()=>{
+  const {error}=await supabase.from("customers").insert({user_id:user.id,name:cname.value.trim(),address:caddress.value.trim(),phone:cphone.value.trim(),email:cemail.value.trim()});
+  if(error)msg(cmsg,error.message);else{msg(cmsg,"Customer saved.",true);cname.value=caddress.value=cphone.value=cemail.value="";await loadAll()}
 };
-function jobs(){
-  app.innerHTML=`<div class="row"><h2>Jobs</h2><button class="btn" onclick="jobForm()">+ Job</button></div>
-  <div class="card">${d.jobs.map((x,i)=>`<div class="item"><div class="row"><div><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${x.date} · ${x.repeat} · ${£(x.price)}</div></div>
-  <button class="btn btn2" onclick="done('${x.id}',${x.done})">${x.done?'Done':'Complete'}</button></div></div>`).join('')||'<div class="muted">No jobs yet.</div>'}</div>`;
-}
-window.jobForm=()=>{
-  if(!d.customers.length)return alert('Add a customer first');
-  app.innerHTML=`<h2>New job</h2><div class="card"><label>Customer</label><select id="jc">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
-  <label>Job</label><input id="jt" placeholder="Lawn maintenance">
-  <div class="formgrid"><div><label>Date</label><input type="date" id="jd"></div><div><label>Repeat</label><select id="jr"><option>One-off</option><option>Weekly</option><option>Fortnightly</option><option>4-weekly</option><option>6-weekly</option></select></div></div>
-  <label>Price</label><input type="number" step=".01" id="jp"><br><br><button class="btn" onclick="addJob()">Save job</button></div>`;
+addJob.onclick=async()=>{
+  if(!jobCustomer.value)return msg(jmsg,"Choose a customer.");
+  const {error}=await supabase.from("jobs").insert({user_id:user.id,customer_id:jobCustomer.value,title:jtitle.value.trim()||"Garden visit",date:jdate.value,repeat:jrepeat.value,price:Number(jprice.value||0)});
+  if(error)msg(jmsg,error.message);else{msg(jmsg,"Job saved.",true);jtitle.value=jprice.value="";await loadAll()}
 };
-window.addJob=async()=>{
-  if(!jt.value.trim()||!jd.value)return alert('Enter the job and date');
-  const {error}=await supabase.from('jobs').insert({user_id:user.id,customer_id:jc.value,title:jt.value.trim(),date:jd.value,repeat:jr.value,price:+jp.value||0,done:false});
-  if(error)return alert(error.message);await loadData();jobs();
+addInvoice.onclick=async()=>{
+  if(!invoiceCustomer.value)return msg(imsg,"Choose a customer.");
+  const {error}=await supabase.from("invoices").insert({user_id:user.id,customer_id:invoiceCustomer.value,invoice_number:invoiceNumber.value.trim(),amount:Number(invoiceAmount.value||0),paid:invoicePaid.value==="true"});
+  if(error)msg(imsg,error.message);else{msg(imsg,"Invoice saved.",true);invoiceNumber.value=invoiceAmount.value="";await loadAll()}
 };
-window.done=async(id,state)=>{const {error}=await supabase.from('jobs').update({done:!state}).eq('id',id);if(error)return alert(error.message);await loadData();jobs();};
-
-function quotes(){
-  app.innerHTML=`<div class="row"><h2>Quotes</h2><button class="btn" onclick="quoteForm()">+ Quote</button></div><div class="card">
-  ${d.quotes.map(x=>`<div class="item"><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${£(x.amount)} · ${x.status}</div></div>`).join('')||'<div class="muted">No quotes yet.</div>'}</div>`;
-}
-window.quoteForm=()=>{
-  if(!d.customers.length)return alert('Add a customer first');
-  app.innerHTML=`<h2>New quote</h2><div class="card"><label>Customer</label><select id="qc">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
-  <label>Description</label><input id="qt"><label>Amount</label><input type="number" step=".01" id="qa"><br><br><button class="btn" onclick="addQuote()">Save quote</button></div>`;
-};
-window.addQuote=async()=>{const {error}=await supabase.from('quotes').insert({user_id:user.id,customer_id:qc.value,title:qt.value,amount:+qa.value||0,status:'Draft'});if(error)return alert(error.message);await loadData();quotes();};
-
-function invoices(){
-  app.innerHTML=`<div class="row"><h2>Invoices</h2><button class="btn" onclick="invoiceForm()">+ Invoice</button></div><div class="card">
-  ${d.invoices.map(x=>`<div class="item"><div class="row"><div><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${£(x.amount)}</div></div>
-  <button class="btn" onclick="pay('${x.id}','${x.status}')">${x.status==='Paid'?'Unpay':'Mark paid'}</button></div></div>`).join('')||'<div class="muted">No invoices yet.</div>'}</div>`;
-}
-window.invoiceForm=()=>{
-  if(!d.customers.length)return alert('Add a customer first');
-  app.innerHTML=`<h2>New invoice</h2><div class="card"><label>Customer</label><select id="ic">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
-  <label>Description</label><input id="it"><label>Amount</label><input type="number" step=".01" id="ia"><br><br><button class="btn" onclick="addInvoice()">Save invoice</button></div>`;
-};
-window.addInvoice=async()=>{const {error}=await supabase.from('invoices').insert({user_id:user.id,customer_id:ic.value,title:it.value,amount:+ia.value||0,status:'Unpaid'});if(error)return alert(error.message);await loadData();invoices();};
-window.pay=async(id,status)=>{const {error}=await supabase.from('invoices').update({status:status==='Paid'?'Unpaid':'Paid'}).eq('id',id);if(error)return alert(error.message);await loadData();invoices();};
-
 start();
 </script>
 </body>

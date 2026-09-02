@@ -1,88 +1,19 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GardenPro</title>
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#193b23">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<style>
-:root{--g:#2f6b3b;--dark:#193b23;--bg:#f4f6f1;--card:#fff;--line:#dfe5df;--muted:#6b756d;--ink:#1f2a22}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
-.app{display:flex;min-height:100vh}.side{width:230px;background:var(--dark);color:white;padding:22px 14px}.logo{font-size:23px;font-weight:800;margin:0 10px 26px}.nav button{display:block;width:100%;border:0;background:none;color:#dbe8dd;padding:12px;border-radius:9px;text-align:left;margin:3px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#2b5c36;color:#fff}
-.main{width:100%;max-width:1250px;margin:auto;padding:28px}.top{display:flex;justify-content:space-between;gap:15px;align-items:center;margin-bottom:22px}.top h1{margin:0 0 3px;font-size:28px}.muted{color:var(--muted);font-size:13px}
-.btn{border:0;background:var(--g);color:white;padding:10px 15px;border-radius:9px;font-weight:700;cursor:pointer}.btn.secondary{background:#edf1ec;color:var(--ink)}.btn.danger{background:#b94a48}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}.stat{font-size:28px;font-weight:800;margin-top:5px}
-.section{margin-top:18px}.section h2{font-size:18px;margin-top:0}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:12px 9px;border-bottom:1px solid var(--line);font-size:14px}.pill{background:#e8f1e8;color:var(--g);padding:5px 8px;border-radius:99px;font-size:12px;font-weight:700}
-.actions{display:flex;gap:7px;flex-wrap:wrap}.modal{display:none;position:fixed;inset:0;background:#0008;align-items:center;justify-content:center;padding:20px}.modal.show{display:flex}.box{background:white;border-radius:16px;padding:22px;width:min(620px,100%)}.form{display:grid;grid-template-columns:1fr 1fr;gap:11px}.form input,.form select,.form textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit}.full{grid-column:1/-1}.recurring{background:#f7faf6;border:1px solid var(--line);padding:12px;border-radius:10px}.check{display:flex;gap:8px;align-items:center}.toast{position:fixed;right:20px;bottom:20px;background:#193b23;color:#fff;padding:12px 15px;border-radius:9px;display:none}
-@media(max-width:800px){.side{width:70px}.logo{font-size:0}.logo:before{content:"🌿";font-size:23px}.nav button{font-size:0;text-align:center}.nav button:before{content:"•";font-size:20px}.grid{grid-template-columns:1fr 1fr}.main{padding:18px}}@media(max-width:520px){.grid,.form{grid-template-columns:1fr}.full{grid-column:auto}}
-</style>
-</head>
-<body>
-<div class="app">
-<aside class="side"><div class="logo">🌿 GardenPro</div><div class="nav">
-<button class="active" onclick="page('dashboard',this)">Dashboard</button>
-<button onclick="page('schedule',this)">Schedule</button>
-<button onclick="page('customers',this)">Customers</button>
-<button onclick="page('quotes',this)">Quotes</button>
-<button onclick="page('settings',this)">Settings</button>
-</div></aside>
-<main class="main">
-<div class="top"><div><h1 id="title">Dashboard</h1><div class="muted">Your gardening business, organised.</div></div><button class="btn" onclick="openModal()">+ New job</button></div>
-<div id="content"></div>
-</main></div>
-<div class="modal" id="modal"><div class="box"><h2>New job</h2>
-<div class="form">
-<input id="c" placeholder="Customer name"><input id="d" type="date">
-<input id="j" class="full" placeholder="Job description">
-<input id="p" type="number" min="0" step="0.01" placeholder="Price (£)">
-<select id="s"><option>Scheduled</option><option>Completed</option><option>Quoted</option></select>
-<div class="recurring full"><label class="check"><input id="r" type="checkbox" onchange="toggleRecurring()"> Make recurring</label>
-<div id="recFields" style="display:none;margin-top:10px"><select id="freq"><option value="7">Every week</option><option value="14">Every 2 weeks</option><option value="28">Every 4 weeks</option><option value="42">Every 6 weeks</option></select></div></div>
-</div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button class="btn secondary" onclick="closeModal()">Cancel</button><button class="btn" onclick="saveJob()">Save job</button></div>
-</div></div><div class="toast" id="toast"></div>
-
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1f6b45"><link rel="manifest" href="manifest.webmanifest"><title>GardenPro</title><style>
+body{margin:0;font-family:system-ui;background:#f4f7f4;color:#17221b}header{background:#1f6b45;color:#fff;padding:18px}nav{display:flex;overflow:auto;background:#fff;border-bottom:1px solid #ddd}nav button{padding:13px;border:0;background:#fff;font-weight:700}main{padding:16px;max-width:900px;margin:auto}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:15px;margin-bottom:14px}.stat{font-size:28px;font-weight:800}.muted{color:#68736c;font-size:13px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.btn{background:#1f6b45;color:#fff;border:0;border-radius:9px;padding:10px 13px;font-weight:700}.btn2{background:#e8eee9;color:#1f6b45}.item{padding:12px 0;border-bottom:1px solid #ddd}input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}label{display:block;font-size:13px;font-weight:700;margin:9px 0 4px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:600px){.formgrid{grid-template-columns:1fr}}</style></head>
+<body><header><b style="font-size:24px">🌱 GardenPro</b><div>Professional gardener business manager</div></header>
+<nav><button onclick="page('dash')">Dashboard</button><button onclick="page('customers')">Customers</button><button onclick="page('jobs')">Jobs</button><button onclick="page('quotes')">Quotes</button><button onclick="page('invoices')">Invoices</button></nav><main id="app"></main>
 <script>
-const KEY='gardenpro_v2'; let jobs=JSON.parse(localStorage.getItem(KEY)||'[]');
-if(!jobs.length) jobs=[
-{id:1,customer:'Sarah Wilson',date:'2026-09-03',job:'Lawn cut & hedge trim',price:65,status:'Scheduled',recurring:true,every:14},
-{id:2,customer:'James McLean',date:'2026-09-04',job:'Garden maintenance',price:55,status:'Scheduled',recurring:true,every:14},
-{id:3,customer:'Oakbank Property',date:'2026-09-05',job:'Full garden tidy',price:180,status:'Quoted',recurring:false,every:0}
-]; save();
-
-function save(){localStorage.setItem(KEY,JSON.stringify(jobs))}
-function money(n){return '£'+Number(n||0).toFixed(2)}
-function today(){return new Date().toISOString().slice(0,10)}
-function toast(t){let x=document.getElementById('toast');x.textContent=t;x.style.display='block';setTimeout(()=>x.style.display='none',2200)}
-function page(name,el){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');document.getElementById('title').textContent={dashboard:'Dashboard',schedule:'Schedule',customers:'Customers',quotes:'Quotes',settings:'Settings'}[name];({dashboard,schedule,customers,quotes,settings}[name])()}
-function dashboard(){
- let upcoming=jobs.filter(x=>x.status==='Scheduled').sort((a,b)=>a.date.localeCompare(b.date));let completed=jobs.filter(x=>x.status==='Completed');let quotes=jobs.filter(x=>x.status==='Quoted');
- document.getElementById('content').innerHTML=`<div class="grid">
- <div class="card"><div class="muted">Next jobs</div><div class="stat">${upcoming.length}</div></div>
- <div class="card"><div class="muted">Quoted value</div><div class="stat">${money(quotes.reduce((a,x)=>a+ +x.price,0))}</div></div>
- <div class="card"><div class="muted">Completed revenue</div><div class="stat">${money(completed.reduce((a,x)=>a+ +x.price,0))}</div></div>
- <div class="card"><div class="muted">Customers</div><div class="stat">${new Set(jobs.map(x=>x.customer)).size}</div></div></div>
- <div class="card section"><h2>Weather-smart planning</h2><p>🌦️ Demo mode: GardenPro flags wet-weather risk. In production this will connect to live local weather.</p><div class="actions"><button class="btn" onclick="weatherDemo()">Check next 7 days</button></div></div>
- <div class="card section"><h2>Upcoming jobs</h2>${table(upcoming.slice(0,8),true)}</div>`;
-}
-function table(a,actions=false){if(!a.length)return '<div class="muted">Nothing here yet.</div>';return `<table class="table"><tr><th>Date</th><th>Customer</th><th>Job</th><th>Price</th><th>Status</th>${actions?'<th>Actions</th>':''}</tr>${a.map(x=>`<tr><td>${x.date}</td><td>${x.customer}</td><td>${x.job}${x.recurring?' 🔁':''}</td><td>${money(x.price)}</td><td><span class="pill">${x.status}</span></td>${actions?`<td><div class="actions"><button class="btn secondary" onclick="complete(${x.id})">Complete</button><button class="btn secondary" onclick="duplicate(${x.id})">Repeat</button></div></td>`:''}</tr>`).join('')}</table>`}
-function schedule(){let a=[...jobs].sort((x,y)=>x.date.localeCompare(y.date));document.getElementById('content').innerHTML=`<div class="card"><h2>All jobs</h2>${table(a,true)}</div>`}
-function customers(){let names=[...new Set(jobs.map(x=>x.customer))];document.getElementById('content').innerHTML=`<div class="card"><h2>Customers</h2>${names.map(n=>{let a=jobs.filter(x=>x.customer===n);return `<div style="padding:14px 0;border-bottom:1px solid var(--line)"><b>${n}</b><div class="muted">${a.length} jobs · ${money(a.reduce((s,x)=>s+ +x.price,0))} total value</div></div>`}).join('')||'<div class="muted">No customers yet.</div>'}</div>`}
-function quotes(){let q=jobs.filter(x=>x.status==='Quoted');document.getElementById('content').innerHTML=`<div class="card"><h2>Quotes</h2>${table(q,true)}</div>`}
-function settings(){document.getElementById('content').innerHTML=`<div class="card"><h2>GardenPro settings</h2><p class="muted">Business settings will live here in the full version.</p><button class="btn danger" onclick="resetData()">Reset demo data</button></div>`}
-function openModal(){document.getElementById('modal').classList.add('show');d.value=today()}
-function closeModal(){document.getElementById('modal').classList.remove('show')}
-function toggleRecurring(){recFields.style.display=r.checked?'block':'none'}
-function saveJob(){let x={id:Date.now(),customer:c.value.trim(),date:d.value,job:j.value.trim(),price:+p.value||0,status:s.value,recurring:r.checked,every:r.checked? +freq.value:0};if(!x.customer||!x.date||!x.job)return alert('Fill in customer, date and job.');jobs.push(x);save();closeModal();toast('Job saved');dashboard()}
-function complete(id){let x=jobs.find(x=>x.id===id);x.status='Completed';save();toast('Job marked complete');schedule()}
-function duplicate(id){let x=jobs.find(x=>x.id===id);let n={...x,id:Date.now(),status:'Scheduled',date:addDays(x.date,x.every||14)};jobs.push(n);save();toast('Next visit created');schedule()}
-function addDays(ds,n){let d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)}
-function weatherDemo(){alert('Weather-smart demo: live weather integration will check rain, wind and frost before each visit and suggest a better day.')}
-function resetData(){if(confirm('Reset all GardenPro demo data?')){localStorage.removeItem(KEY);location.reload()}}
-dashboard();
-</script><script>
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
+const K='gp-pro-v1';let d=JSON.parse(localStorage.getItem(K)||'null')||{customers:[],jobs:[],quotes:[],invoices:[]};const save=()=>localStorage.setItem(K,JSON.stringify(d));const £=n=>'£'+Number(n||0).toFixed(2);
+function page(p){if(p==='dash')dash();if(p==='customers')customers();if(p==='jobs')jobs();if(p==='quotes')quotes();if(p==='invoices')invoices()}
+function dash(){let today=new Date().toISOString().slice(0,10);app.innerHTML=`<h2>Dashboard</h2><div class=grid><div class=card><div class=stat>${d.customers.length}</div><div class=muted>Customers</div></div><div class=card><div class=stat>${d.jobs.filter(x=>x.date===today&&!x.done).length}</div><div class=muted>Jobs today</div></div><div class=card><div class=stat>${£(d.invoices.filter(x=>x.status!=='Paid').reduce((a,x)=>a+x.amount,0))}</div><div class=muted>Outstanding</div></div><div class=card><div class=stat>${d.quotes.length}</div><div class=muted>Quotes</div></div></div><div class=card><div class=row><h3>Upcoming jobs</h3><button class=btn onclick="jobForm()">+ Job</button></div>${d.jobs.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5).map(x=>`<div class=item><b>${x.title}</b><div class=muted>${x.customer} · ${x.date} · ${x.repeat}</div></div>`).join('')||'<div class=muted>No jobs yet.</div>'}</div>`}
+function customers(){app.innerHTML=`<div class=row><h2>Customers</h2><button class=btn onclick="customerForm()">+ Customer</button></div><div class=card>${d.customers.map((x,i)=>`<div class=item><b>${x.name}</b><div class=muted>${x.address||''} · ${x.phone||''}</div></div>`).join('')||'<div class=muted>No customers yet.</div>'}</div>`}
+function customerForm(){app.innerHTML=`<h2>New customer</h2><div class=card><label>Name</label><input id=cn><label>Address</label><input id=ca><div class=formgrid><div><label>Phone</label><input id=cp></div><div><label>Email</label><input id=ce></div></div><label>Notes</label><textarea id=ct></textarea><br><br><button class=btn onclick="addCustomer()">Save customer</button></div>`}
+function addCustomer(){if(!cn.value.trim())return alert('Enter a name');d.customers.push({name:cn.value,address:ca.value,phone:cp.value,email:ce.value,notes:ct.value});save();customers()}
+function jobs(){app.innerHTML=`<div class=row><h2>Jobs</h2><button class=btn onclick="jobForm()">+ Job</button></div><div class=card>${d.jobs.map((x,i)=>`<div class=item><div class=row><div><b>${x.title}</b><div class=muted>${x.customer} · ${x.date} · ${x.repeat}</div></div><button class="btn btn2" onclick="done(${i})">${x.done?'Done':'Complete'}</button></div></div>`).join('')||'<div class=muted>No jobs yet.</div>'}</div>`}
+function jobForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New job</h2><div class=card><label>Customer</label><select id=jc>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Job</label><input id=jt placeholder="Lawn maintenance"><div class=formgrid><div><label>Date</label><input type=date id=jd></div><div><label>Repeat</label><select id=jr><option>One-off</option><option>Weekly</option><option>Fortnightly</option><option>4-weekly</option><option>6-weekly</option></select></div></div><label>Price</label><input type=number step=.01 id=jp><br><br><button class=btn onclick="addJob()">Save job</button></div>`}
+function addJob(){d.jobs.push({customer:jc.value,title:jt.value,date:jd.value,repeat:jr.value,price:+jp.value||0,done:false});save();jobs()}function done(i){d.jobs[i].done=!d.jobs[i].done;save();jobs()}
+function quotes(){app.innerHTML=`<div class=row><h2>Quotes</h2><button class=btn onclick="quoteForm()">+ Quote</button></div><div class=card>${d.quotes.map(x=>`<div class=item><b>${x.title}</b><div class=muted>${x.customer} · ${£(x.amount)} · ${x.status}</div></div>`).join('')||'<div class=muted>No quotes yet.</div>'}</div>`}
+function quoteForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New quote</h2><div class=card><label>Customer</label><select id=qc>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Description</label><input id=qt><label>Amount</label><input type=number step=.01 id=qa><br><br><button class=btn onclick="addQuote()">Save quote</button></div>`}function addQuote(){d.quotes.push({customer:qc.value,title:qt.value,amount:+qa.value||0,status:'Draft'});save();quotes()}
+function invoices(){app.innerHTML=`<div class=row><h2>Invoices</h2><button class=btn onclick="invoiceForm()">+ Invoice</button></div><div class=card>${d.invoices.map((x,i)=>`<div class=item><div class=row><div><b>${x.title}</b><div class=muted>${x.customer} · ${£(x.amount)}</div></div><button class=btn onclick="pay(${i})">${x.status==='Paid'?'Unpay':'Mark paid'}</button></div></div>`).join('')||'<div class=muted>No invoices yet.</div>'}</div>`}
+function invoiceForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New invoice</h2><div class=card><label>Customer</label><select id=ic>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Description</label><input id=it><label>Amount</label><input type=number step=.01 id=ia><br><br><button class=btn onclick="addInvoice()">Save invoice</button></div>`}function addInvoice(){d.invoices.push({customer:ic.value,title:it.value,amount:+ia.value||0,status:'Unpaid'});save();invoices()}function pay(i){d.invoices[i].status=d.invoices[i].status==='Paid'?'Unpaid':'Paid';save();invoices()}page('dash');
 </script></body></html>

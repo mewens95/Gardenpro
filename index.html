@@ -1,19 +1,193 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1f6b45"><link rel="manifest" href="manifest.webmanifest"><title>GardenPro</title><style>
-body{margin:0;font-family:system-ui;background:#f4f7f4;color:#17221b}header{background:#1f6b45;color:#fff;padding:18px}nav{display:flex;overflow:auto;background:#fff;border-bottom:1px solid #ddd}nav button{padding:13px;border:0;background:#fff;font-weight:700}main{padding:16px;max-width:900px;margin:auto}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:15px;margin-bottom:14px}.stat{font-size:28px;font-weight:800}.muted{color:#68736c;font-size:13px}.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.btn{background:#1f6b45;color:#fff;border:0;border-radius:9px;padding:10px 13px;font-weight:700}.btn2{background:#e8eee9;color:#1f6b45}.item{padding:12px 0;border-bottom:1px solid #ddd}input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}label{display:block;font-size:13px;font-weight:700;margin:9px 0 4px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:600px){.formgrid{grid-template-columns:1fr}}</style></head>
-<body><header><b style="font-size:24px">🌱 GardenPro</b><div>Professional gardener business manager</div></header>
-<nav><button onclick="page('dash')">Dashboard</button><button onclick="page('customers')">Customers</button><button onclick="page('jobs')">Jobs</button><button onclick="page('quotes')">Quotes</button><button onclick="page('invoices')">Invoices</button></nav><main id="app"></main>
-<script>
-const K='gp-pro-v1';let d=JSON.parse(localStorage.getItem(K)||'null')||{customers:[],jobs:[],quotes:[],invoices:[]};const save=()=>localStorage.setItem(K,JSON.stringify(d));const £=n=>'£'+Number(n||0).toFixed(2);
-function page(p){if(p==='dash')dash();if(p==='customers')customers();if(p==='jobs')jobs();if(p==='quotes')quotes();if(p==='invoices')invoices()}
-function dash(){let today=new Date().toISOString().slice(0,10);app.innerHTML=`<h2>Dashboard</h2><div class=grid><div class=card><div class=stat>${d.customers.length}</div><div class=muted>Customers</div></div><div class=card><div class=stat>${d.jobs.filter(x=>x.date===today&&!x.done).length}</div><div class=muted>Jobs today</div></div><div class=card><div class=stat>${£(d.invoices.filter(x=>x.status!=='Paid').reduce((a,x)=>a+x.amount,0))}</div><div class=muted>Outstanding</div></div><div class=card><div class=stat>${d.quotes.length}</div><div class=muted>Quotes</div></div></div><div class=card><div class=row><h3>Upcoming jobs</h3><button class=btn onclick="jobForm()">+ Job</button></div>${d.jobs.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5).map(x=>`<div class=item><b>${x.title}</b><div class=muted>${x.customer} · ${x.date} · ${x.repeat}</div></div>`).join('')||'<div class=muted>No jobs yet.</div>'}</div>`}
-function customers(){app.innerHTML=`<div class=row><h2>Customers</h2><button class=btn onclick="customerForm()">+ Customer</button></div><div class=card>${d.customers.map((x,i)=>`<div class=item><b>${x.name}</b><div class=muted>${x.address||''} · ${x.phone||''}</div></div>`).join('')||'<div class=muted>No customers yet.</div>'}</div>`}
-function customerForm(){app.innerHTML=`<h2>New customer</h2><div class=card><label>Name</label><input id=cn><label>Address</label><input id=ca><div class=formgrid><div><label>Phone</label><input id=cp></div><div><label>Email</label><input id=ce></div></div><label>Notes</label><textarea id=ct></textarea><br><br><button class=btn onclick="addCustomer()">Save customer</button></div>`}
-function addCustomer(){if(!cn.value.trim())return alert('Enter a name');d.customers.push({name:cn.value,address:ca.value,phone:cp.value,email:ce.value,notes:ct.value});save();customers()}
-function jobs(){app.innerHTML=`<div class=row><h2>Jobs</h2><button class=btn onclick="jobForm()">+ Job</button></div><div class=card>${d.jobs.map((x,i)=>`<div class=item><div class=row><div><b>${x.title}</b><div class=muted>${x.customer} · ${x.date} · ${x.repeat}</div></div><button class="btn btn2" onclick="done(${i})">${x.done?'Done':'Complete'}</button></div></div>`).join('')||'<div class=muted>No jobs yet.</div>'}</div>`}
-function jobForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New job</h2><div class=card><label>Customer</label><select id=jc>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Job</label><input id=jt placeholder="Lawn maintenance"><div class=formgrid><div><label>Date</label><input type=date id=jd></div><div><label>Repeat</label><select id=jr><option>One-off</option><option>Weekly</option><option>Fortnightly</option><option>4-weekly</option><option>6-weekly</option></select></div></div><label>Price</label><input type=number step=.01 id=jp><br><br><button class=btn onclick="addJob()">Save job</button></div>`}
-function addJob(){d.jobs.push({customer:jc.value,title:jt.value,date:jd.value,repeat:jr.value,price:+jp.value||0,done:false});save();jobs()}function done(i){d.jobs[i].done=!d.jobs[i].done;save();jobs()}
-function quotes(){app.innerHTML=`<div class=row><h2>Quotes</h2><button class=btn onclick="quoteForm()">+ Quote</button></div><div class=card>${d.quotes.map(x=>`<div class=item><b>${x.title}</b><div class=muted>${x.customer} · ${£(x.amount)} · ${x.status}</div></div>`).join('')||'<div class=muted>No quotes yet.</div>'}</div>`}
-function quoteForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New quote</h2><div class=card><label>Customer</label><select id=qc>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Description</label><input id=qt><label>Amount</label><input type=number step=.01 id=qa><br><br><button class=btn onclick="addQuote()">Save quote</button></div>`}function addQuote(){d.quotes.push({customer:qc.value,title:qt.value,amount:+qa.value||0,status:'Draft'});save();quotes()}
-function invoices(){app.innerHTML=`<div class=row><h2>Invoices</h2><button class=btn onclick="invoiceForm()">+ Invoice</button></div><div class=card>${d.invoices.map((x,i)=>`<div class=item><div class=row><div><b>${x.title}</b><div class=muted>${x.customer} · ${£(x.amount)}</div></div><button class=btn onclick="pay(${i})">${x.status==='Paid'?'Unpay':'Mark paid'}</button></div></div>`).join('')||'<div class=muted>No invoices yet.</div>'}</div>`}
-function invoiceForm(){if(!d.customers.length)return alert('Add a customer first');app.innerHTML=`<h2>New invoice</h2><div class=card><label>Customer</label><select id=ic>${d.customers.map(x=>`<option>${x.name}</option>`).join('')}</select><label>Description</label><input id=it><label>Amount</label><input type=number step=.01 id=ia><br><br><button class=btn onclick="addInvoice()">Save invoice</button></div>`}function addInvoice(){d.invoices.push({customer:ic.value,title:it.value,amount:+ia.value||0,status:'Unpaid'});save();invoices()}function pay(i){d.invoices[i].status=d.invoices[i].status==='Paid'?'Unpaid':'Paid';save();invoices()}page('dash');
-</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1f6b45">
+<link rel="manifest" href="manifest.webmanifest">
+<title>GardenPro</title>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:#f4f7f4;color:#17221b}
+header{background:#1f6b45;color:#fff;padding:18px}
+nav{display:flex;overflow:auto;background:#fff;border-bottom:1px solid #ddd}
+nav button{padding:13px;border:0;background:#fff;font-weight:700;white-space:nowrap}
+main{padding:16px;max-width:900px;margin:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:15px;margin-bottom:14px}
+.stat{font-size:28px;font-weight:800}.muted{color:#68736c;font-size:13px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.btn{background:#1f6b45;color:#fff;border:0;border-radius:9px;padding:10px 13px;font-weight:700}
+.btn2{background:#e8eee9;color:#1f6b45}.item{padding:12px 0;border-bottom:1px solid #ddd}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
+label{display:block;font-size:13px;font-weight:700;margin:9px 0 4px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.auth{max-width:430px;margin:35px auto}.danger{color:#9a2d2d}
+@media(max-width:600px){.formgrid{grid-template-columns:1fr}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="row">
+    <div><b style="font-size:24px">🌱 GardenPro</b><div>Professional gardener business manager</div></div>
+    <button id="logout" class="btn" style="display:none;background:#fff;color:#1f6b45" onclick="signOut()">Log out</button>
+  </div>
+</header>
+
+<div id="loginNav"></div>
+<nav id="nav" style="display:none">
+  <button onclick="page('dash')">Dashboard</button>
+  <button onclick="page('customers')">Customers</button>
+  <button onclick="page('jobs')">Jobs</button>
+  <button onclick="page('quotes')">Quotes</button>
+  <button onclick="page('invoices')">Invoices</button>
+</nav>
+<main id="app"></main>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://acvbzacoopgpszdcdkbq.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_5gbQgDnijY4r6lPmTzYBsA_PD9Dgp4z';
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+let user = null;
+let d = {customers:[],jobs:[],quotes:[],invoices:[]};
+const app = document.getElementById('app');
+const nav = document.getElementById('nav');
+const logoutBtn = document.getElementById('logout');
+const £ = n => '£' + Number(n || 0).toFixed(2);
+
+function authScreen(message=''){
+  nav.style.display='none'; logoutBtn.style.display='none';
+  app.innerHTML=`<div class="card auth">
+    <h2>GardenPro login</h2>
+    <div class="muted">Your customers, jobs, quotes and invoices are stored securely in your GardenPro account.</div>
+    ${message?`<p class="danger">${message}</p>`:''}
+    <label>Email</label><input id="email" type="email" autocomplete="email">
+    <label>Password</label><input id="password" type="password" autocomplete="current-password">
+    <br><br>
+    <button class="btn" onclick="login()">Log in</button>
+    <button class="btn btn2" onclick="signup()">Create account</button>
+    <p class="muted">Use your own email and password. GardenPro will keep your business data separate from other users.</p>
+  </div>`;
+}
+window.login = async () => {
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  if(!email||!password) return authScreen('Enter your email and password.');
+  const {error}=await supabase.auth.signInWithPassword({email,password});
+  if(error) return authScreen(error.message);
+};
+window.signup = async () => {
+  const email=document.getElementById('email').value.trim(), password=document.getElementById('password').value;
+  if(!email||!password) return authScreen('Enter your email and password.');
+  if(password.length<6) return authScreen('Password must be at least 6 characters.');
+  const {data,error}=await supabase.auth.signUp({email,password});
+  if(error) return authScreen(error.message);
+  if(!data.session) return authScreen('Account created. Check your email to confirm it, then log in.');
+};
+window.signOut = async()=>{await supabase.auth.signOut();};
+
+async function loadData(){
+  const [c,j,q,i] = await Promise.all([
+    supabase.from('customers').select('*').order('name'),
+    supabase.from('jobs').select('*,customers(name)').order('date'),
+    supabase.from('quotes').select('*,customers(name)').order('created_at',{ascending:false}),
+    supabase.from('invoices').select('*,customers(name)').order('created_at',{ascending:false})
+  ]);
+  for(const r of [c,j,q,i]) if(r.error) throw r.error;
+  d.customers=c.data||[];
+  d.jobs=j.data||[];
+  d.quotes=q.data||[];
+  d.invoices=i.data||[];
+}
+async function start(){
+  const {data:{session}}=await supabase.auth.getSession();
+  user=session?.user||null;
+  if(!user){authScreen();return;}
+  nav.style.display='flex'; logoutBtn.style.display='block';
+  try{await loadData();page('dash');}
+  catch(e){app.innerHTML=`<div class="card"><h2>Database setup needed</h2><p>The GardenPro database tables have not been set up yet.</p><p>Run the supplied <b>supabase-schema.sql</b> once in Supabase SQL Editor, then refresh this page.</p><p class="danger">${e.message}</p></div>`;}
+}
+supabase.auth.onAuthStateChange(()=>start());
+
+window.page = p => {
+  if(p==='dash') dash();
+  if(p==='customers') customers();
+  if(p==='jobs') jobs();
+  if(p==='quotes') quotes();
+  if(p==='invoices') invoices();
+};
+function dash(){
+  const today=new Date().toISOString().slice(0,10);
+  const outstanding=d.invoices.filter(x=>x.status!=='Paid').reduce((a,x)=>a+Number(x.amount||0),0);
+  app.innerHTML=`<h2>Dashboard</h2>
+  <div class="grid">
+    <div class="card"><div class="stat">${d.customers.length}</div><div class="muted">Customers</div></div>
+    <div class="card"><div class="stat">${d.jobs.filter(x=>x.date===today&&!x.done).length}</div><div class="muted">Jobs today</div></div>
+    <div class="card"><div class="stat">${£(outstanding)}</div><div class="muted">Money outstanding</div></div>
+    <div class="card"><div class="stat">${d.quotes.length}</div><div class="muted">Quotes</div></div>
+  </div>
+  <div class="card"><div class="row"><h3>Upcoming jobs</h3><button class="btn" onclick="jobForm()">+ Job</button></div>
+  ${d.jobs.filter(x=>!x.done).slice(0,6).map(x=>`<div class="item"><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${x.date} · ${x.repeat}</div></div>`).join('')||'<div class="muted">No upcoming jobs.</div>'}</div>`;
+}
+function customers(){
+  app.innerHTML=`<div class="row"><h2>Customers</h2><button class="btn" onclick="customerForm()">+ Customer</button></div>
+  <div class="card">${d.customers.map(x=>`<div class="item"><b>${x.name}</b><div class="muted">${x.address||''} · ${x.phone||''}</div></div>`).join('')||'<div class="muted">No customers yet.</div>'}</div>`;
+}
+window.customerForm=()=>{app.innerHTML=`<h2>New customer</h2><div class="card">
+<label>Name</label><input id="cn">
+<label>Address</label><input id="ca">
+<div class="formgrid"><div><label>Phone</label><input id="cp"></div><div><label>Email</label><input id="ce" type="email"></div></div>
+<label>Notes</label><textarea id="ct"></textarea><br><br><button class="btn" onclick="addCustomer()">Save customer</button></div>`};
+window.addCustomer=async()=>{
+  if(!cn.value.trim())return alert('Enter a name');
+  const {error}=await supabase.from('customers').insert({user_id:user.id,name:cn.value.trim(),address:ca.value,phone:cp.value,email:ce.value,notes:ct.value});
+  if(error)return alert(error.message); await loadData();customers();
+};
+function jobs(){
+  app.innerHTML=`<div class="row"><h2>Jobs</h2><button class="btn" onclick="jobForm()">+ Job</button></div>
+  <div class="card">${d.jobs.map((x,i)=>`<div class="item"><div class="row"><div><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${x.date} · ${x.repeat} · ${£(x.price)}</div></div>
+  <button class="btn btn2" onclick="done('${x.id}',${x.done})">${x.done?'Done':'Complete'}</button></div></div>`).join('')||'<div class="muted">No jobs yet.</div>'}</div>`;
+}
+window.jobForm=()=>{
+  if(!d.customers.length)return alert('Add a customer first');
+  app.innerHTML=`<h2>New job</h2><div class="card"><label>Customer</label><select id="jc">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
+  <label>Job</label><input id="jt" placeholder="Lawn maintenance">
+  <div class="formgrid"><div><label>Date</label><input type="date" id="jd"></div><div><label>Repeat</label><select id="jr"><option>One-off</option><option>Weekly</option><option>Fortnightly</option><option>4-weekly</option><option>6-weekly</option></select></div></div>
+  <label>Price</label><input type="number" step=".01" id="jp"><br><br><button class="btn" onclick="addJob()">Save job</button></div>`;
+};
+window.addJob=async()=>{
+  if(!jt.value.trim()||!jd.value)return alert('Enter the job and date');
+  const {error}=await supabase.from('jobs').insert({user_id:user.id,customer_id:jc.value,title:jt.value.trim(),date:jd.value,repeat:jr.value,price:+jp.value||0,done:false});
+  if(error)return alert(error.message);await loadData();jobs();
+};
+window.done=async(id,state)=>{const {error}=await supabase.from('jobs').update({done:!state}).eq('id',id);if(error)return alert(error.message);await loadData();jobs();};
+
+function quotes(){
+  app.innerHTML=`<div class="row"><h2>Quotes</h2><button class="btn" onclick="quoteForm()">+ Quote</button></div><div class="card">
+  ${d.quotes.map(x=>`<div class="item"><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${£(x.amount)} · ${x.status}</div></div>`).join('')||'<div class="muted">No quotes yet.</div>'}</div>`;
+}
+window.quoteForm=()=>{
+  if(!d.customers.length)return alert('Add a customer first');
+  app.innerHTML=`<h2>New quote</h2><div class="card"><label>Customer</label><select id="qc">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
+  <label>Description</label><input id="qt"><label>Amount</label><input type="number" step=".01" id="qa"><br><br><button class="btn" onclick="addQuote()">Save quote</button></div>`;
+};
+window.addQuote=async()=>{const {error}=await supabase.from('quotes').insert({user_id:user.id,customer_id:qc.value,title:qt.value,amount:+qa.value||0,status:'Draft'});if(error)return alert(error.message);await loadData();quotes();};
+
+function invoices(){
+  app.innerHTML=`<div class="row"><h2>Invoices</h2><button class="btn" onclick="invoiceForm()">+ Invoice</button></div><div class="card">
+  ${d.invoices.map(x=>`<div class="item"><div class="row"><div><b>${x.title}</b><div class="muted">${x.customers?.name||''} · ${£(x.amount)}</div></div>
+  <button class="btn" onclick="pay('${x.id}','${x.status}')">${x.status==='Paid'?'Unpay':'Mark paid'}</button></div></div>`).join('')||'<div class="muted">No invoices yet.</div>'}</div>`;
+}
+window.invoiceForm=()=>{
+  if(!d.customers.length)return alert('Add a customer first');
+  app.innerHTML=`<h2>New invoice</h2><div class="card"><label>Customer</label><select id="ic">${d.customers.map(x=>`<option value="${x.id}">${x.name}</option>`).join('')}</select>
+  <label>Description</label><input id="it"><label>Amount</label><input type="number" step=".01" id="ia"><br><br><button class="btn" onclick="addInvoice()">Save invoice</button></div>`;
+};
+window.addInvoice=async()=>{const {error}=await supabase.from('invoices').insert({user_id:user.id,customer_id:ic.value,title:it.value,amount:+ia.value||0,status:'Unpaid'});if(error)return alert(error.message);await loadData();invoices();};
+window.pay=async(id,status)=>{const {error}=await supabase.from('invoices').update({status:status==='Paid'?'Unpaid':'Paid'}).eq('id',id);if(error)return alert(error.message);await loadData();invoices();};
+
+start();
+</script>
+</body>
+</html>

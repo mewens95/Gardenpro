@@ -53,44 +53,13 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Create release upload key
-        env:
-          KEY_PASSWORD: GardenProUpload2026
-        run: |
-          keytool -genkeypair -v \
-            -keystore gardenpro-upload.jks \
-            -alias gardenpro \
-            -keyalg RSA -keysize 2048 \
-            -validity 10000 \
-            -storepass "$KEY_PASSWORD" \
-            -keypass "$KEY_PASSWORD" \
-            -dname "CN=GardenPro, OU=GardenPro, O=GardenPro, L=London, ST=England, C=GB"
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('android/app/build.gradle')
-          s=p.read_text()
-          marker='android {'
-          signing='''\n    signingConfigs {\n        release {\n            storeFile file("../../gardenpro-upload.jks")\n            storePassword "GardenProUpload2026"\n            keyAlias "gardenpro"\n            keyPassword "GardenProUpload2026"\n        }\n    }\n'''
-          s=s.replace(marker, marker+signing, 1)
-          s=s.replace('buildTypes {', 'buildTypes {', 1)
-          s=s.replace('release {', 'release {\n            signingConfig signingConfigs.release', 1)
-          p.write_text(s)
-          PY
-
-      - name: Build signed Android App Bundle
+      - name: Build Android App Bundle
         working-directory: android
         run: ./gradlew bundleRelease
-
-      - name: Package Play upload files
-        run: |
-          mkdir -p play-upload
-          cp android/app/build/outputs/bundle/release/app-release.aab play-upload/GardenPro.aab
-          cp gardenpro-upload.jks play-upload/GardenPro-upload-key.jks
-          printf '%s\n' 'Keystore password: GardenProUpload2026' 'Key alias: gardenpro' 'Key password: GardenProUpload2026' > play-upload/UPLOAD-KEY-DETAILS.txt
 
       - name: Upload GardenPro Play bundle
         uses: actions/upload-artifact@v4
         with:
-          name: GardenPro-Play-Upload
-          path: play-upload/
+          name: GardenPro-Play-Bundle
+          path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30

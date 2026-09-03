@@ -1,0 +1,32 @@
+name: Build PWA icons
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build PNG icons
+        run: |
+          convert -background none icon-192.svg -resize 192x192 icon-192.png
+          convert -background none icon-512.svg -resize 512x512 icon-512.png
+          python - <<'PY'
+          import json
+          p='manifest.webmanifest'
+          m=json.load(open(p))
+          m['icons']=[
+            {'src':'icon-192.png','sizes':'192x192','type':'image/png','purpose':'any maskable'},
+            {'src':'icon-512.png','sizes':'512x512','type':'image/png','purpose':'any maskable'}
+          ]
+          open(p,'w').write(json.dumps(m,indent=2)+'\n')
+          PY
+      - name: Commit generated icons
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add icon-192.png icon-512.png manifest.webmanifest
+          git diff --cached --quiet || git commit -m 'Add installable PWA PNG icons'
+          git push

@@ -11,10 +11,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build PNG icons
         run: |
-          convert -background none icon-192.svg -resize 192x192 icon-192.png
-          convert -background none icon-512.svg -resize 512x512 icon-512.png
+          python -m pip install --quiet cairosvg
           python - <<'PY'
+          import cairosvg
           import json
+          cairosvg.svg2png(url='icon-192.svg', write_to='icon-192.png', output_width=192, output_height=192)
+          cairosvg.svg2png(url='icon-512.svg', write_to='icon-512.png', output_width=512, output_height=512)
           p='manifest.webmanifest'
           m=json.load(open(p))
           m['icons']=[

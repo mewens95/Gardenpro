@@ -5,7 +5,7 @@ on:
 
 jobs:
   fix:
-    if: "!startsWith(github.event.head_commit.message, 'Fix GardenPro PWA registration')"
+    if: "!startsWith(github.event.head_commit.message, 'PWA registration cleanup')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -25,5 +25,5 @@ jobs:
           git config user.name "GardenPro Builder"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git diff --cached --quiet || git commit -m "Fix GardenPro PWA registration"
+          git diff --cached --quiet || git commit -m "PWA registration cleanup"
           git push

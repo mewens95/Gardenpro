@@ -1,0 +1,30 @@
+name: Fix session refresh
+on:
+  push:
+    branches: [main]
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch session refresh
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          old="async function boot(){try{await load();await render()}catch(e){head();app.innerHTML=`<div class=\"card\"><h2>GardenPro could not load</h2><p>${esc(e.message)}</p><p class=\"muted\">Refresh the page and try again.</p></div>`;navigation()}}"
+          new="async function boot(){try{await load();await render()}catch(e){try{if(session?.refresh_token){session=await auth('/auth/v1/token?grant_type=refresh_token',{method:'POST',body:JSON.stringify({refresh_token:session.refresh_token})});session.user_id=session.user?.id||session.user_id;save();await load();await render();return}}catch(re){e=re}head();app.innerHTML=`<div class=\"card\"><h2>GardenPro could not load</h2><p>${esc(e.message)}</p><p class=\"muted\">Refresh the page and try again.</p></div>`;navigation()}}"
+          if old not in s:
+              raise SystemExit('target not found')
+          p.write_text(s.replace(old,new))
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git commit -m "Refresh expired sessions automatically" || exit 0
+          git push

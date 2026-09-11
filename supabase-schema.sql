@@ -1,6 +1,6 @@
 -- GardenPro database setup
 -- Run this ONCE in Supabase > SQL Editor.
--- It creates the tables and security rules used by the GardenPro website.
+-- It creates the tables and security rules used by the GardenPro app.
 
 create extension if not exists pgcrypto;
 
@@ -47,10 +47,21 @@ create table if not exists public.invoices (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.expenses (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  date date not null default current_date,
+  title text not null,
+  amount numeric(12,2) not null default 0,
+  notes text,
+  created_at timestamptz not null default now()
+);
+
 alter table public.customers enable row level security;
 alter table public.jobs enable row level security;
 alter table public.quotes enable row level security;
 alter table public.invoices enable row level security;
+alter table public.expenses enable row level security;
 
 drop policy if exists "customers own rows" on public.customers;
 create policy "customers own rows" on public.customers for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
@@ -64,7 +75,11 @@ create policy "quotes own rows" on public.quotes for all to authenticated using 
 drop policy if exists "invoices own rows" on public.invoices;
 create policy "invoices own rows" on public.invoices for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
 
+drop policy if exists "expenses own rows" on public.expenses;
+create policy "expenses own rows" on public.expenses for all to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
 create index if not exists customers_user_id_idx on public.customers(user_id);
 create index if not exists jobs_user_id_date_idx on public.jobs(user_id,date);
 create index if not exists quotes_user_id_idx on public.quotes(user_id);
 create index if not exists invoices_user_id_idx on public.invoices(user_id);
+create index if not exists expenses_user_id_date_idx on public.expenses(user_id,date);

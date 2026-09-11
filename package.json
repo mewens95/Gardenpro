@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "android:build": "npx cap add android && npx cap sync android && cd android && ./gradlew bundleRelease"
+    "android:build": "node build-mobile.mjs"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",

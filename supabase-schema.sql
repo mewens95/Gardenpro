@@ -83,3 +83,20 @@ create index if not exists jobs_user_id_date_idx on public.jobs(user_id,date);
 create index if not exists quotes_user_id_idx on public.quotes(user_id);
 create index if not exists invoices_user_id_idx on public.invoices(user_id);
 create index if not exists expenses_user_id_date_idx on public.expenses(user_id,date);
+
+-- Lets a signed-in user permanently delete their own account.
+-- Because auth.users has ON DELETE CASCADE relationships to the GardenPro tables,
+-- deleting the auth user also deletes their GardenPro business data.
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+begin
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke execute on function public.delete_my_account() from public;
+grant execute on function public.delete_my_account() to authenticated;

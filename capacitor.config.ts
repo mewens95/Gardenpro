@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.gardenpro.app',
+  appId: 'com.gardenpro.gardening',
   appName: 'GardenPro',
   webDir: 'www',
   bundledWebRuntime: false

@@ -60,18 +60,52 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Build Android App Bundle
+      - name: Generate temporary upload key
+        run: |
+          export KEYSTORE_PASSWORD="GardenProTemp2026!"
+          export KEY_PASSWORD="GardenProTemp2026!"
+          echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
+          keytool -genkeypair -v \
+            -keystore android/gardenpro-upload.jks \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -keypass "$KEY_PASSWORD" \
+            -alias gardenpro-upload \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -dname "CN=GardenPro, OU=GardenPro, O=GardenPro, L=Glasgow, ST=Scotland, C=GB"
+
+      - name: Configure release signing
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          signing = '''\n    signingConfigs {\n        release {\n            storeFile file('../gardenpro-upload.jks')\n            storePassword System.getenv('KEYSTORE_PASSWORD')\n            keyAlias 'gardenpro-upload'\n            keyPassword System.getenv('KEY_PASSWORD')\n        }\n    }\n'''
+          s=s.replace('android {', 'android {' + signing, 1)
+          s=s.replace('release {\n            minifyEnabled false', "release {\n            signingConfig signingConfigs.release\n            minifyEnabled false", 1)
+          p.write_text(s)
+          PY
+
+      - name: Build signed Android App Bundle
         working-directory: android
         run: |
           chmod +x gradlew
           ./gradlew bundleRelease --no-daemon
 
-      - name: Upload GardenPro Play bundle
+      - name: Export upload certificate
+        run: |
+          keytool -export -rfc \
+            -keystore android/gardenpro-upload.jks \
+            -storepass "$KEYSTORE_PASSWORD" \
+            -alias gardenpro-upload \
+            -file gardenpro-upload-certificate.pem
+
+      - name: Upload GardenPro Play bundle and certificate
         uses: actions/upload-artifact@v4
         with:
-          name: GardenPro-Play-Bundle
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: GardenPro-Play-Upload
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            gardenpro-upload-certificate.pem
           retention-days: 30
           if-no-files-found: error
-
-# Trigger a fresh Android build after fixing the release pipeline.

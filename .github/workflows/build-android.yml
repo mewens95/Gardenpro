@@ -47,6 +47,17 @@ jobs:
       - name: Sync web app into Android project
         run: npx cap sync android
 
+      - name: Set GardenPro version code
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          import re
+          s=re.sub(r'versionCode\\s+\\d+', 'versionCode 2', s)
+          p.write_text(s)
+          PY
+
       - name: Configure Android 16 / API 36
         run: |
           python3 - <<'PY'

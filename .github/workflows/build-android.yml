@@ -72,19 +72,11 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Generate temporary upload key
+      - name: Configure upload signing key
         run: |
-          export KEYSTORE_PASSWORD="GardenProTemp2026!"
-          export KEY_PASSWORD="GardenProTemp2026!"
-          echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> "$GITHUB_ENV"
-          echo "KEY_PASSWORD=$KEY_PASSWORD" >> "$GITHUB_ENV"
-          keytool -genkeypair -v \
-            -keystore android/gardenpro-upload.jks \
-            -storepass "$KEYSTORE_PASSWORD" \
-            -keypass "$KEY_PASSWORD" \
-            -alias gardenpro-upload \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname "CN=GardenPro, OU=GardenPro, O=GardenPro, L=Glasgow, ST=Scotland, C=GB"
+          echo "${{ secrets.GARDENPRO_KEYSTORE_BASE64 }}" | base64 --decode > android/gardenpro-upload.jks
+          echo "KEYSTORE_PASSWORD=${{ secrets.GARDENPRO_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "KEY_PASSWORD=${{ secrets.GARDENPRO_KEY_PASSWORD }}" >> "$GITHUB_ENV"
 
       - name: Configure release signing
         run: |
@@ -98,7 +90,7 @@ jobs:
           p.write_text(s)
           PY
 
-      - name: Set GardenPro version code
+      - name: Set GardenPro version
         run: |
           python3 - <<'PY'
           from pathlib import Path

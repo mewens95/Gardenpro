@@ -1,3 +1,4 @@
+# Trigger rebuild for the GardenPro 1.0.1 tester release.
 name: Build GardenPro Android
 
 on:
